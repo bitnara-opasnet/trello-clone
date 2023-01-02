@@ -28,38 +28,42 @@ const Boards = styled.div`
 
 function App() {
     const [toDos, setToDos] = useRecoilState(toDoState);
-    const onDragEnd = ({draggableId, destination, source}: DropResult) => {
+    const onDragEnd = ({destination, source}: DropResult) => {
         if (!destination) return;
         if (destination?.droppableId === source.droppableId) {
             setToDos((allBoards) => {
                 const boardCopy = [...allBoards[source.droppableId]];
+                const taskObj = boardCopy[source.index];
                 boardCopy.splice(source.index, 1);
-                boardCopy.splice(destination?.index, 0, draggableId);
+                boardCopy.splice(destination?.index, 0, taskObj);
                 return {
                     ...allBoards,
                     [source.droppableId]: boardCopy,
                 };
-            })
+            });
         } else if (destination?.droppableId !== source.droppableId) {
             setToDos((allBoards) => {
                 const sourceBoardCopy = [...allBoards[source.droppableId]];
+                const taskObj = sourceBoardCopy[source.index];
                 const destinationBoardCopy = [...allBoards[destination.droppableId]];
                 sourceBoardCopy.splice(source.index, 1);
-                destinationBoardCopy.splice(destination?.index, 0, draggableId);
+                destinationBoardCopy.splice(destination?.index, 0, taskObj);
                 return {
                     ...allBoards,
                     [source.droppableId]: sourceBoardCopy,
                     [destination.droppableId]: destinationBoardCopy,
                 };
-            })
-        }
+            });
+        };
         
     };
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <Wrapper>
                 <Boards>
-                    {Object.keys(toDos).map(boardId => <Board key={boardId} boardId={boardId} toDos={toDos[boardId]}  />)}
+                    {Object.keys(toDos).map((boardId) => 
+                        <Board key={boardId} boardId={boardId} toDos={toDos[boardId]} />
+                    )}
                 </Boards>
             </Wrapper>
         </DragDropContext>
